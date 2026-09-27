@@ -1,0 +1,146 @@
+import re
+
+STUDENT_FILE = "students.txt"
+INPUT_FILE = "input_log.txt"
+
+
+# -------------------------------
+# Email Validation
+# -------------------------------
+def validate_email(email):
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+    if re.match(pattern, email):
+        return True
+    return False
+
+
+# -------------------------------
+# Save User Input to Log File
+# -------------------------------
+def save_input(input_text):
+    with open(INPUT_FILE, "a") as file:
+        file.write(input_text + "\n")
+
+
+# -------------------------------
+# Add Student
+# -------------------------------
+def add_student():
+    print("\n--- Add Student ---")
+
+    try:
+        roll_no = input("Enter Roll Number: ")
+        save_input("Roll Number: " + roll_no)
+
+        if not roll_no.isdigit():
+            raise ValueError("Roll number must contain only numbers.")
+
+        name = input("Enter Student Name: ")
+        save_input("Student Name: " + name)
+
+        if not name.strip():
+            raise ValueError("Name cannot be empty.")
+
+        email = input("Enter Email: ")
+        save_input("Email: " + email)
+
+        if not validate_email(email):
+            raise ValueError("Invalid email format.")
+
+        age = input("Enter Age: ")
+        save_input("Age: " + age)
+
+        if not age.isdigit():
+            raise ValueError("Age must be a number.")
+
+        age = int(age)
+
+        if age <= 0:
+            raise ValueError("Age must be greater than 0.")
+
+        # Store student data
+        student_data = f"{roll_no},{name},{email},{age}\n"
+
+        with open(STUDENT_FILE, "a") as file:
+            file.write(student_data)
+
+        print("\nStudent added successfully!")
+
+    except ValueError as e:
+        print("Invalid Input:", e)
+
+    except Exception as e:
+        print("An unexpected error occurred:", e)
+
+
+# -------------------------------
+# Read Student Data
+# -------------------------------
+def read_students():
+    print("\n--- Student Records ---")
+
+    try:
+        with open(STUDENT_FILE, "r") as file:
+            records = file.readlines()
+
+            if not records:
+                print("No student records found.")
+                return
+
+            print("\nRoll No\tName\tEmail\t\tAge")
+            print("-" * 50)
+
+            for record in records:
+                data = record.strip().split(",")
+
+                if len(data) == 4:
+                    roll_no, name, email, age = data
+                    print(f"{roll_no}\t{name}\t{email}\t{age}")
+
+    except FileNotFoundError:
+        print("Student file does not exist yet.")
+
+    except Exception as e:
+        print("Error reading file:", e)
+
+
+# -------------------------------
+# Main Menu
+# -------------------------------
+def main():
+    while True:
+
+        print("\n==============================")
+        print("   STUDENT RECORD MANAGER")
+        print("==============================")
+        print("1. Add Student")
+        print("2. Read Student Data")
+        print("3. Exit")
+
+        try:
+            choice = input("Enter your choice: ")
+            save_input("Menu Choice: " + choice)
+
+            if choice == "1":
+                add_student()
+
+            elif choice == "2":
+                read_students()
+
+            elif choice == "3":
+                print("Thank you!")
+                break
+
+            else:
+                raise ValueError("Please enter 1, 2, or 3.")
+
+        except ValueError as e:
+            print("Invalid Input:", e)
+
+
+# -------------------------------
+# Start Program
+# -------------------------------
+if __name__ == "__main__":
+    main()
